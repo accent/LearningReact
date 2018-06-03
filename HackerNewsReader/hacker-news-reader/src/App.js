@@ -23,20 +23,63 @@ class App extends Component {
 class HackerNewsGrid extends Component{
   constructor(props) {
     super(props);
-    this.state = {current_page: 1};
+    this.state = {
+      current_page: 1, 
+      items: []
+    };
   }
+
+  componentDidMount() {
+    this.loadContent(1);
+  }
+
+  handleClick = (i) => {
+    if(i === 1 && this.state.current_page + i > 1 || i === -1 && this.state.current_page + i > 0)
+    {
+      this.setState({current_page: this.state.current_page + i});
+      this.loadContent(this.state.current_page);
+    }
+  }
+
+  loadContent = (pageNo) => {
+    if(pageNo > 0)
+    {
+      fetch("http://node-hnapi.herokuapp.com/news?page="+pageNo)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          this.setState({
+              items: result
+            });
+        },
+        (error) => {
+          alert(error);
+        }
+      )
+    }
+  } 
 
   render()
   {
+    const { error, items } = this.state;
     return (
       <div class="container">
           <div class="row">
+          <ul>
+            {
+              items.map(item => (
+              <li key={item.id}>
+                {item.title} {item.points}
+              </li>
+            ))
+            }
+          </ul>
           </div>
           <div class="row">
             <div class="col">
-              <Button>Previous</Button>
+              <Button onClick={() => this.handleClick(-1)} className={(this.state.current_page === 1) ? "hidden" : ""}>Previous</Button>
               <label>{this.state.current_page}</label>
-              <Button>Next</Button>
+              <Button onClick={() => this.handleClick(1)}>Next</Button>
             </div>
         </div>
       </div>
