@@ -11,6 +11,7 @@ const SelectPage = ({ page, ...rest }) => {
         case 'list':
         default:
             View = NewsList;
+            break;
     }
 
     return (
